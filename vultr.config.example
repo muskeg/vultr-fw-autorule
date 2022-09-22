@@ -1,0 +1,18 @@
+[vultr]
+# Find the group ID in the firewall resources page
+firewall_group_id = THE_FIREWALL_GROUP_ID
+
+# Generate API key from account settings
+api_key = YOUR_API_KEY
+
+# Rename accordingly
+tracking_filename = vultr.rules.example
+
+[rules]
+ports = {
+        "service1": {"port": "8080", "protocol": "tcp"},
+        "service2": {"port": "8666", "protocol": "udp"},
+        "service3": {"port": "22222", "protocol": "tcp"},
+        "service4": {"port": "10010", "protocol": "tcp"},
+        "ssh": {"port": "22", "protocol": "tcp"}
+    }
