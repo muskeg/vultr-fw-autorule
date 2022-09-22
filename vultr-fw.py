@@ -1,47 +1,45 @@
 #!/usr/bin/python3
+
+
 import sys
+if sys.version_info[0] == 2:
+    from ConfigParser import RawConfigParser
+if sys.version_info[0] >= 3:
+    from configparser import RawConfigParser
 import requests
 import json
 from datetime import datetime
 
 
+# read configuration file
+config_file_name = sys.argv[1] or "vultr.config"
+config = RawConfigParser()
+config.read(config_file_name)
+
+# Parse config
+firewall_groupid = config.get("vultr", "firewall_groupid")
+api_key = config.get("vultr", "api_key")
+filename = config.get("vultr", "tracking_filename")
+ports_list = json.loads(config.get("rules", "ports"))
+
 ip = requests.get('https://api.ipify.org').text
-vultr_create = "https://api.vultr.com/v1/firewall/rule_create"
-vultr_delete ="https://api.vultr.com/v1/firewall/rule_delete"
-existing_rule = 1
-firewall_groupid = 'THE_FIREWALLGROUPID (as seen in the firewall page url)'
-api_key = 'YOUR_API_KEY'
-filename = 'PATH/TO/A/FILE/TO/KEEP/TRACK/OF/CREATED_RULES'
-ports_list = {
-    'jenkins': {'port': '8080', 'protocol': 'tcp'},
-    'k3s-flannel': {'port': '8472', 'protocol': 'udp'},
-    'k3s-kubelet': {'port': '10250', 'protocol': 'tcp'},
-    'cockpit': {'port': '9090', 'protocol': 'tcp'},
-    'ssh': {'port': '22', 'protocol': 'tcp'}
-}
+vultr_create_api = "https://api.vultr.com/v2/firewalls/" + firewall_groupid + "/rules"
+vultr_delete_base ="https://api.vultr.com/v2/firewalls/" + firewall_groupid + "/rules/"
 
-
-
-headers = {'API-Key': api_key}
+headers = {'Authorization': 'Bearer ' + api_key}
 
 fw_rules = open(filename, 'r')
 rules_list = fw_rules.readlines()
 
 for rule_number in rules_list:
-    data_delete = {
-        'FIREWALLGROUPID': firewall_groupid,
-        'rulenumber': rule_number.strip()
-    }
-    r = requests.post(vultr_delete, data=data_delete, headers=headers)
+    r = requests.delete(vultr_delete_base + rule_number.strip(), headers=headers)
 fw_rules.close()
 
 
 fw_rules = open(filename, 'w')
-for desc, port in ports_list.items():
-    #print(desc + ': ' + port['port'] + ' - ' + port['protocol'])
+for desc, port in ports_list.items():=
     data_create = {
-        'FIREWALLGROUPID': firewall_groupid,
-        'direction': 'in',
+        'souce': '',
         'ip_type': 'v4',
         'protocol':  port['protocol'],
         'subnet': ip,
@@ -50,11 +48,12 @@ for desc, port in ports_list.items():
         'notes': 'auto ' + desc + ' rule'
     }
 
-    r = requests.post(vultr_create, data=data_create, headers=headers)
-    if '412' not in str(r):
-        result = json.loads(r.content)
-        print("Rule for " + desc + " created. Rule number: " + str(result['rulenumber']))
-        fw_rules.write(str(result['rulenumber']) + "\n")
+    r = requests.post(vultr_create_api, json=data_create, headers=headers)
+    result = json.loads(r.content)
+    if r.status_code == 201:
+
+        print("Rule for " + desc + " created. Rule number: " + str(result['firewall_rule']['id']))
+        fw_rules.write(str(result['firewall_rule']['id']) + "\n")
     else:
         print(r.content)
 
