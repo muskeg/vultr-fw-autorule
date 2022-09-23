@@ -37,7 +37,7 @@ fw_rules.close()
 
 
 fw_rules = open(filename, 'w')
-for desc, port in ports_list.items():=
+for desc, port in ports_list.items():
     data_create = {
         'souce': '',
         'ip_type': 'v4',
