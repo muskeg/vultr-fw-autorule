@@ -19,7 +19,7 @@ Rule for snmp created. Rule number: 4
 
 ### vultr.config.example
 
-An example/template of the required configuration file
+An example/template of the required configuration file:
 
 ```
 [vultr]
