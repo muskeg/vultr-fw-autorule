@@ -2,6 +2,8 @@
 Script to update Vultr's firewall rules for dynamic public IP addresses.
 It uses the client's public IP and creates/updates rules according to the configuration file
 
+The script tracks created rules in a file in order to clean them up during rotation.
+
 ## How-to
 The script expects a mandatory positional argument to specify the configuration file:
 
@@ -44,3 +46,4 @@ The service name is used in the rule's annotation.
 The script does not support custom source IP at the moment and will always use the client's public IP.
 
 
+### 
