@@ -39,11 +39,13 @@ ports = {
         "ssh": {"port": "22", "protocol": "tcp"}
     }
 ```
-The rules section is a dictionary of rules that will be created in the firewall group. 
+The rules section is a dictionary of rules that will be created in the firewall group. The keys should be explicit enough.
 
 The service name is used in the rule's annotation. 
 
 The script does not support custom source IP at the moment and will always use the client's public IP.
 
 
-### 
+### vultr-fw.py
+
+The firewall client script. The script expects the path to the configuration file as a mandatory positional argument.
